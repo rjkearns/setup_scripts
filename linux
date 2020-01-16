@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+
+fancy_echo() {
+  printf "\n%b\n" "$1"
+}
+
+
+if ! [ -f "$HOME/.bash_profile" ]; then
+  touch $HOME/.bash_profile
+fi
+
+if ! [ -s "$HOME/.gemrc" ]; then
+  touch $HOME/.gemrc
+fi
+
+if ! fgrep -qs "gem: --no-document" "$HOME/.gemrc"; then
+  echo "gem: --no-document" >> ~/.gemrc
+fi
+
+fancy_echo "Updating system packages ..."
+  apt-get update
+fancy_echo "Installing sudo ..."
+  apt-get -y install sudo
+fancy_echo "Installing aptitude ..."
+  sudo apt-get install -y aptitude
+  sudo aptitude update
+
+fancy_echo "Installing git ..."
+  sudo aptitude install -y git
+
+fancy_echo "Installing libraries for common gem dependencies ..."
+  sudo aptitude install -y libxslt1-dev libcurl4-openssl-dev libksba8 libksba-dev libqtwebkit-dev libreadline-dev
+
+fancy_echo "Installing Redis ..."
+  sudo aptitude install -y redis-server
+
+fancy_echo "Installing ctags ..."
+  sudo aptitude install -y exuberant-ctags
+
+fancy_echo "Installing vim ..."
+  sudo aptitude install -y vim-gtk
+
+fancy_echo "Installing tmux ..."
+  sudo aptitude install -y tmux
+
+fancy_echo "Installing ImageMagick ..."
+  sudo aptitude install -y imagemagick
+
+fancy_echo "Installing watch ..."
+  sudo aptitude install -y watch
+
+fancy_echo "Installing curl ..."
+  sudo aptitude install -y curl
+
+fancy_echo "Installing automake ..."
+  sudo aptitude install -y automake
+
+fancy_echo "Installing openssl ..."
+  sudo aptitude install -y openssl
+
+fancy_echo "Installing The Silver Searcher ..."
+  sudo aptitude install -y silversearcher-ag
+
+fancy_echo "Installing FZF ..."
+  sudo aptitude install -y fzf
+
+RUBY_VERSION="2.7.0"
+fancy_echo "Installing Ruby management ..."
+  sudo aptitude install -y rbenv
+
+if [[ ! -d "$HOME/.rbenv/plugins/ruby-build" ]]; then
+  fancy_echo "Installing ruby-build, to install Rubies ..."
+    git clone https://github.com/sstephenson/ruby-build.git \
+      ~/.rbenv/plugins/ruby-build
+fi
+
+fancy_echo "Installing supported ruby version ..."
+  rbenv install -s $RUBY_VERSION
+  rbenv global $RUBY_VERSION
+  rbenv rehash
+  eval "$(rbenv init - --no-rehash)"
+  eval "$(rbenv init -)"
+
+
+fancy_echo "Updating to latest Rubygems version ..."
+  gem update --system
+
+fancy_echo "Installing Bundler to install project-specific Ruby gems ..."
+  gem install bundler --no-document --pre
+
+NODE_VERSION="v12.14.1"
+fancy_echo "Installing Node management ..."
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | sh
+  source ~/.nvm/nvm.sh # source nvm so that it's available for the current shell
+  nvm install $NODE_VERSION
+  sudo aptitude install -y yarn
